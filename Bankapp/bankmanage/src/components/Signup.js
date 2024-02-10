@@ -10,7 +10,7 @@ function Signup() {
     const toast = useRef(null);
 
     const showSuccess = () => {
-        toast.current.show({ severity: 'success', summary: 'Success', detail: 'Message Content', life: 3000 });
+        toast.current.show({ severity: 'success', summary: 'Signup Successfully', detail: 'Please login Now', life: 3000 });
     }
 
     const showInfo = () => {
@@ -24,9 +24,6 @@ function Signup() {
     const showError = () => {
         toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
     }
-
-
-
     const [password, setPassword] = useState('');
     const [value1, setValue1] = useState('');
     const [name, setName] = useState('');
@@ -39,7 +36,6 @@ function Signup() {
     const navigate = useNavigate();
     const handlesubmit = async (e) => {
         e.preventDefault();
-
         if (password === value1) {
             const formdata = {
                 password,
@@ -65,7 +61,6 @@ function Signup() {
             alert("Password Doesn't Match");
         }
     };
-
 
     return (
         <div>

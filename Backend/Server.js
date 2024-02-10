@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-// const bcrypt = require('bcrypt'); 
+const bcrypt = require('bcrypt');
 // const crypto = require('crypto');
 var nodemailer = require('nodemailer');
 const cors = require('cors');
@@ -19,8 +19,18 @@ const userSchema = new mongoose.Schema({
     money: String,
 });
 
+const workFactor = 10;
 
-
+const hashPassword = async (password) => {
+    console.log(password)
+    try {
+        const salt = await bcrypt.genSalt(workFactor);
+        const hash = await bcrypt.hash(password, salt);
+        return hash;
+    } catch (error) {
+        throw new Error("Hashing failed");
+    }
+};
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -32,21 +42,19 @@ const transporter = nodemailer.createTransport({
 const mailOptions = {
     from: '"CTC Bank" <chinya2103@gmail.com>',
     subject: "Congratulations on creating new Account",
-    to:" ",
+    to: " ",
     text: "Hello signup successfully"
 };
 
 function randomnumber(length) {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
-
     for (let i = 0; i < length; i++) {
         const randomIndex = Math.floor(Math.random() * characters.length);
         result += characters.charAt(randomIndex);
     }
     return result;
 }
-
 const User = mongoose.model('Users', userSchema);
 app.use(cors());
 app.use(bodyParser.json());
@@ -54,13 +62,16 @@ app.post('/postdata', async (req, res) => {
     try {
         const { name, email, pan, address, phone, password, money } = req.body;
         const accountno = randomnumber(10);
+        console.log(password);
+        const pass = await hashPassword(password);
+        console.log(pass);
         const newUser = new User({
             name,
             email,
             pan,
             address,
             phone,
-            password,
+            password: pass,
             accountno,
             money,
         });
@@ -85,8 +96,6 @@ app.post('/postdata', async (req, res) => {
     }
 });
 
-
-
 app.put('/updatedata/:id', async (req, res) => {
     try {
         const contactId = req.params.id;
@@ -107,7 +116,6 @@ app.put('/updatedata/:id', async (req, res) => {
     }
 });
 
-
 app.get('/getcontacts', async (req, res) => {
     try {
         const contacts = await Contact.find();
@@ -118,24 +126,33 @@ app.get('/getcontacts', async (req, res) => {
     }
 });
 
-app.get('/getbyid', async (req, res) => {
-    try {
-        const id = req.query.id;
-        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ error: 'Invalid or missing ID parameter' });
+app.post('/getalluser', async (req, res) => {
+    const { email, password } = req.body;
+    console.log(email);
+    try {   
+        const users = await User.find();
+        for (const user of users) {
+            var emailFound=false;
+            if (user.email === email) {
+                console.log("email found");
+                emailFound = true;
+                const passwordMatch = await bcrypt.compare(password, user.password);
+                if (passwordMatch) {
+                    console.log("matched")
+                    return res.status(200).json(user);
+                } else {
+                    console.log("not yet")
+                    return res.status(401).json({ error: 'Incorrect password' });
+                }
+            }
         }
-        const data = await Contact.findById(id);
-
-        if (data) {
-            res.json(data);
-        } else {
-            res.status(404).json({ error: 'Data not found' });
-        }
+        return res.status(404).json({ error: 'Email not found' });
     } catch (error) {
-        console.error('Error fetching data by ID:', error);
+        console.error('Error fetching all users or comparing passwords:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
 
 app.delete('/deletecontact/:id', async (req, res) => {
     try {
@@ -155,10 +172,6 @@ app.delete('/deletecontact/:id', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
-
-
-
-
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });

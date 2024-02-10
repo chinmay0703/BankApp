@@ -1,8 +1,15 @@
 import React from 'react'
+import Nav from '../routes/Nav'
+import Footer from '../routes/Footer'
 
 function Dashboard() {
   return (
-    <div>Dashboard</div>
+    <div>
+
+        <Nav></Nav>
+        
+        <Footer></Footer>
+    </div>
   )
 }
 
