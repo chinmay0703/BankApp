@@ -2,7 +2,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
-// const crypto = require('crypto');
+const dotenv = require('dotenv');
+
+const jwt = require('jsonwebtoken');
+dotenv.config();
 var nodemailer = require('nodemailer');
 const cors = require('cors');
 const app = express();
@@ -64,7 +67,7 @@ app.use(bodyParser.json());
 app.post('/postdata', async (req, res) => {
     try {
         const { name, email, pan, address, phone, password, money } = req.body;
-        const existingUser = await User.findOne({ email });
+        const existingUser = await User.findOne({ email: email });
         if (existingUser) {
             console.log("Email found");
             return res.status(400).json({ error: 'Email already exists' });
@@ -103,34 +106,15 @@ app.post('/postdata', async (req, res) => {
 });
 
 
-app.put('/updatedata/:id', async (req, res) => {
-    try {
-        const contactId = req.params.id;
-        const updatedData = req.body;
-        if (!mongoose.Types.ObjectId.isValid(contactId)) {
-            return res.status(400).json({ error: 'Invalid contactId format' });
-        }
-        const updatedContact = await Contact.findByIdAndUpdate(contactId, updatedData, { new: true });
-        if (updatedContact) {
-            res.json({ message: 'Contact updated successfully', updatedContact });
-
-        } else {
-            res.status(404).json({ error: 'Contact not found' });
-        }
-    } catch (error) {
-        console.error('Error updating contact:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+app.get('/getall', async (req, res) => {
+    const users = await User.find();
+    res.status(200).json(users);
 });
 
-app.get('/getalluser', async (req, res) => {
-   
-        const users = await User.find();
-        res.status(200).json(users);
-  
-});
+var jwtSecretKey = process.env.JWT_SECRET_KEY;
+var tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
 
-app.post('/getalluser', async (req, res) => {
+app.post('/auntheticatelogin', async (req, res) => {
     const { email, password } = req.body;
     console.log(email);
     try {
@@ -142,10 +126,16 @@ app.post('/getalluser', async (req, res) => {
                 emailFound = true;
                 const passwordMatch = await bcrypt.compare(password, user.password);
                 if (passwordMatch) {
-                    console.log("matched")
-                    return res.status(200).json(user);
+                    let data = {
+                        time: Date(),
+                        userid: user._id
+                    };
+                    const token = jwt.sign(data, jwtSecretKey);
+                    console.log("Password matched")
+                    console.log("Token Generated")
+                    return res.json({ token });
                 } else {
-                    console.log("not yet")
+                    console.log("Not Matched yet")
                     return res.status(401).json({ error: 'Incorrect password' });
                 }
             }
@@ -156,26 +146,27 @@ app.post('/getalluser', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
-
-
-app.delete('/deletecontact/:id', async (req, res) => {
+app.post("/validateToken", async (req, res) => {
     try {
-        const contactId = req.params.id;
-        console.log("contact of the id ", contactId, "is deleted");
-        if (!mongoose.Types.ObjectId.isValid(contactId)) {
-            return res.status(400).json({ error: 'Invalid contactId format' });
-        }
-        const deletedContact = await Contact.findOneAndDelete({ _id: contactId });
-        if (deletedContact) {
-            res.json({ message: 'Contact deleted successfully' });
+        const { token } = req.body;
+        const jwtSecretKey = process.env.JWT_SECRET_KEY;
+        const { userid } = jwt.verify(token, jwtSecretKey);
+        console.log('Decoded Token:', { userid });
+        const user = await User.findById(userid);
+        if (user) {
+            res.json({ user });
         } else {
-            res.status(404).json({ error: 'Contact not found' });
+            console.error('User not found for userid:', userid);
+            res.status(404).json({ error: 'User not found' });
         }
     } catch (error) {
-        console.error('Error deleting contact:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        console.error('Token verification failed:', error.message);
+        res.status(401).json({ error: 'Token verification failed' });
     }
 });
+
+
+
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });

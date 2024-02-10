@@ -35,11 +35,12 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:3001/getalluser', {
+            const response = await axios.post('http://localhost:3001/auntheticatelogin', {
                 email: formData.email,
                 password: formData.password,
             });
-            console.log('Response:', response.data);
+            console.log('Response:', response.data.token);
+            localStorage.setItem("Token",response.data.token);
             if (response) {
                 showSuccess()
                 setTimeout(function () {
