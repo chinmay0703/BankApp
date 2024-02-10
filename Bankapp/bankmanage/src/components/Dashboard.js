@@ -5,7 +5,6 @@ import Footer from '../routes/Footer'
 function Dashboard() {
   return (
     <div>
-
         <Nav></Nav>
         
         <Footer></Footer>

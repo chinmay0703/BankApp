@@ -17,7 +17,7 @@ function Login() {
 
 
     const showSuccess = () => {
-        toast.current.show({ severity: 'success', summary: 'Login Successfully', detail: 'Welcome', life: 3000 });
+        toast.current.show({ severity: 'success', summary: 'Login Successfully', detail: 'Welcome To the CTC Bank', life: 3000 });
     }
 
     const showInfo = () => {

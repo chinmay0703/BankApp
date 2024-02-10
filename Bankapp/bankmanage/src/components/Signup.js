@@ -22,7 +22,7 @@ function Signup() {
     }
 
     const showError = () => {
-        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Email allready in use', life: 3000 });
     }
     const [password, setPassword] = useState('');
     const [value1, setValue1] = useState('');
@@ -53,8 +53,9 @@ function Signup() {
                 showSuccess();
                 setTimeout(function () {
                     navigate("/login");
-                }, 3000);
+                }, 1000);
             } catch (error) {
+                showError();
                 console.error('Error sending data:', error);
             }
         } else {

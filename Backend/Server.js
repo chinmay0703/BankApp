@@ -6,8 +6,10 @@ const bcrypt = require('bcrypt');
 var nodemailer = require('nodemailer');
 const cors = require('cors');
 const app = express();
+
 const port = 3001;
 mongoose.connect('mongodb+srv://chinmay:LIP54dqmq0o0dODS@contact.cjo104s.mongodb.net/?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true });
+
 const userSchema = new mongoose.Schema({
     name: String,
     email: String,
@@ -41,7 +43,7 @@ const transporter = nodemailer.createTransport({
 
 const mailOptions = {
     from: '"CTC Bank" <chinya2103@gmail.com>',
-    subject: "Congratulations on creating new Account",
+    subject: "Account Creation Notification",
     to: " ",
     text: "Hello signup successfully"
 };
@@ -56,29 +58,33 @@ function randomnumber(length) {
     return result;
 }
 const User = mongoose.model('Users', userSchema);
+
 app.use(cors());
 app.use(bodyParser.json());
 app.post('/postdata', async (req, res) => {
     try {
         const { name, email, pan, address, phone, password, money } = req.body;
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            console.log("Email found");
+            return res.status(400).json({ error: 'Email already exists' });
+        }
         const accountno = randomnumber(10);
-        console.log(password);
-        const pass = await hashPassword(password);
-        console.log(pass);
+        const hashedPassword = await hashPassword(password);
         const newUser = new User({
             name,
             email,
             pan,
             address,
             phone,
-            password: pass,
+            password: hashedPassword,
             accountno,
             money,
         });
         await newUser.save();
         // mailOptions.to = newUser.email;
         // mailOptions.text = `Hello ${name},your account has been created!`;
-        // mailOptions.html = `<b>Hello ${name},</b><br>Your account has been created! `;
+        // mailOptions.html = `<b>Hello ${name},</b><br>Your account has been created  `;
 
         // transporter.sendMail(mailOptions, function (error, info) {
         //     if (error) {
@@ -95,6 +101,7 @@ app.post('/postdata', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
 
 app.put('/updatedata/:id', async (req, res) => {
     try {
@@ -116,23 +123,20 @@ app.put('/updatedata/:id', async (req, res) => {
     }
 });
 
-app.get('/getcontacts', async (req, res) => {
-    try {
-        const contacts = await Contact.find();
-        res.status(200).json(contacts);
-    } catch (error) {
-        console.error('Error fetching contacts:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+app.get('/getalluser', async (req, res) => {
+   
+        const users = await User.find();
+        res.status(200).json(users);
+  
 });
 
 app.post('/getalluser', async (req, res) => {
     const { email, password } = req.body;
     console.log(email);
-    try {   
+    try {
         const users = await User.find();
         for (const user of users) {
-            var emailFound=false;
+            var emailFound = false;
             if (user.email === email) {
                 console.log("email found");
                 emailFound = true;
