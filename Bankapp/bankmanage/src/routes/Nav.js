@@ -1,7 +1,19 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 function Nav() {
+
+    const [token, setToken] = useState('');
+
+    const handlelogout = () => {
+        localStorage.removeItem('Token');
+    };
+
+    useEffect(() => {
+        setToken(localStorage.getItem('Token'));
+    }, []);
+
+
     return (
         <div>
             <nav class="navbar navbar-expand-lg bg-dark">
@@ -17,7 +29,29 @@ function Nav() {
                             </li>
                         </ul>
                         <form class="d-flex" role="search">
-                           <Link to={"/login"}> <button class="btn btn-primary" type="submit">Signin</button></Link>
+                            {token ? (
+                                <Link to="/">
+                                    <button className="btn btn-danger" type="button" onClick={handlelogout}>
+                                        Logout
+                                    </button>
+                                </Link>
+
+                            ) : (
+                                <>
+                                    <Link to="/login">
+                                        <button className="btn btn-primary" type="submit">
+                                            Sign in
+                                        </button>
+                                    </Link>
+                                    <Link to="/Signup">
+                                        <button className="btn btn-warning mx-2" type="submit">
+                                            Sign Up
+                                        </button>
+                                    </Link>
+                                </>
+
+                            )}
+
                         </form>
                     </div>
                 </div>

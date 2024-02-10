@@ -22,10 +22,10 @@ const userSchema = new mongoose.Schema({
     password: String,
     accountno: String,
     money: String,
+    verify:String,
 });
 
 const workFactor = 10;
-
 const hashPassword = async (password) => {
     console.log(password)
     try {
@@ -83,20 +83,20 @@ app.post('/postdata', async (req, res) => {
             password: hashedPassword,
             accountno,
             money,
+            verify,
         });
         await newUser.save();
-        // mailOptions.to = newUser.email;
-        // mailOptions.text = `Hello ${name},your account has been created!`;
-        // mailOptions.html = `<b>Hello ${name},</b><br>Your account has been created  `;
-
-        // transporter.sendMail(mailOptions, function (error, info) {
-        //     if (error) {
-        //         console.log(error);
-        //     } else {
-        //         console.log("Email sent successfully");
-        //         console.log('Email sent:'+ info.response);
-        //     }
-        // });
+        mailOptions.to = newUser.email;
+        mailOptions.text = `Hello ${name},your account has been created!`;
+        mailOptions.html = `<b>Hello ${name},</b><br>Your account has been created  `;
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log("Email sent successfully");
+                console.log('Email sent:'+ info.response);
+            }
+        });
         res.status(200).json({ message: 'User data successfully saved to MongoDB!' });
 
     } catch (error) {
@@ -174,6 +174,9 @@ app.post('/verifyemail', async (req, res) => {
         console.log('User not found');
     }
     if (user) {
+
+        const ver=randomnumber(10);
+        
         console.log(user)
         mailOptions.to = email;
         mailOptions.subject = `Account Verification Required`;

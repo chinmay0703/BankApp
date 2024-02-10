@@ -9,9 +9,7 @@ function Dashboard() {
   const [showform, setShowform] = useState(false);
   const [emailInput, setEmailInput] = useState('');
   const [isEmailVerified, setIsEmailVerified] = useState(false);
-
   const navigate = useNavigate();
-
   useEffect(() => {
     const token = localStorage.getItem('Token');
 
@@ -38,7 +36,7 @@ function Dashboard() {
   };
 
   const handleMakePayment = () => {
-    // Implement your payment logic here
+
     console.log('Payment made!');
   };
 
