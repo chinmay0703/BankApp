@@ -164,6 +164,31 @@ app.post("/validateToken", async (req, res) => {
         res.status(401).json({ error: 'Token verification failed' });
     }
 });
+app.post('/verifyemail', async (req, res) => {
+    const { email } = req.body;
+    console.log(email);
+    const user = await User.findOne({ email });
+    if (user) {
+        console.log('User found:', user);
+    } else {
+        console.log('User not found');
+    }
+    if (user) {
+        console.log(user)
+        mailOptions.to = email;
+        mailOptions.subject = `Account Verification Required`;
+        mailOptions.text = `Hello ${user.name}`;
+        mailOptions.html = `<b>This is an official mail for verification this is your OTP `;
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log("Email sent successfully");
+                console.log('Email sent:' + info.response);
+            }
+        });
+    }
+});
 
 
 

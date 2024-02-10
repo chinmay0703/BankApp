@@ -5,30 +5,49 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 function Dashboard() {
-  const [formdata, setFormadata] = useState({}); // Use the correct state hook
+  const [formdata, setFormadata] = useState({});
+  const [showform, setShowform] = useState(false);
+  const [emailInput, setEmailInput] = useState('');
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("Token");
+    const token = localStorage.getItem('Token');
 
-    axios.post('http://localhost:3001/validateToken', { token })
-      .then(response => {
+    axios
+      .post('http://localhost:3001/validateToken', { token })
+      .then((response) => {
         setFormadata(response.data.user);
         console.log('Response:', response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error);
       });
   }, []);
+
+  const handleEmailVerification = () => {
+    axios.post('http://localhost:3001/verifyemail', { email: emailInput })
+      .then(response => {
+        console.log(response.data.message);
+        setIsEmailVerified(true);
+      })
+      .catch(error => {
+        console.error('Email verification failed:', error.message);
+      });
+  };
+
+  const handleMakePayment = () => {
+    // Implement your payment logic here
+    console.log('Payment made!');
+  };
 
   return (
     <div>
       <Nav />
       <h1 className='text-center my-5'>User Details</h1>
       <div className='container'>
-      <button className='btn btn-primary text-start my-3'>Transaction</button>
-        <div className='row text-center table-responsive-xl'>
-          
+        <div className='row'>
           <table className='table table-hover'>
             <thead>
               <tr className='table-primary'>
@@ -54,9 +73,51 @@ function Dashboard() {
             </tbody>
           </table>
         </div>
+        {!isEmailVerified && showform && (
+          <div className='row'>
+            <div className='col-md-6 offset-md-3'>
+              <div className='input-group mb-3'>
+                <input
+                  type='text'
+                  className='form-control'
+                  placeholder='Enter Email'
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                />
+                <button
+                  className='btn btn-outline-secondary'
+                  type='button'
+                  id='button-addon2'
+                  onClick={handleEmailVerification}
+                >
+                  Verify
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {isEmailVerified && (
+          <div className='row'>
+            <div className='col-md-6 offset-md-3'>
+              <button
+                className='btn btn-primary my-3'
+                onClick={handleMakePayment}
+              >
+                Make Payment
+              </button>
+            </div>
+          </div>
+        )}
+        <button
+          className='btn btn-primary my-3'
+          onClick={() => setShowform(true)}
+        >
+          Make Payment
+        </button>
       </div>
       <Footer />
     </div>
   );
 }
+
 export default Dashboard;
