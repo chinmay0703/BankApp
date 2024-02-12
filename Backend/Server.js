@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const dotenv = require('dotenv');
-
 const jwt = require('jsonwebtoken');
 dotenv.config();
 var nodemailer = require('nodemailer');
@@ -13,13 +12,10 @@ const app = express();
 const port = 3001;
 mongoose.connect('mongodb+srv://chinmay:LIP54dqmq0o0dODS@contact.cjo104s.mongodb.net/?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true });
 
-
-
-
 const transactionSchema = new mongoose.Schema({
     date: { type: Date, default: Date.now },
     senderemail: String,
-    receivermail:String,
+    receivermail: String,
     amount: Number,
 });
 
@@ -28,7 +24,7 @@ const userSchema = new mongoose.Schema({
     email: String,
     pan: String,
     address: String,
-    phone: String,
+    phone: Number,
     password: String,
     accountno: String,
     money: Number,
@@ -99,7 +95,7 @@ app.post('/postdata', async (req, res) => {
         await newUser.save();
         const mailOptions = {
             to: newUser.email,
-            subject: 'Welcome to Our Exclusive Platform',
+            subject: 'Welcome to CTC Bank',
             text: `Dear ${name},\n\nGreetings! We are thrilled to welcome you to our exclusive platform. Your account has been successfully created, and you are now part of a community committed to excellence.`,
             html: `
                 <p style="font-size: 16px; color: #333; line-height: 1.6;">
@@ -199,6 +195,9 @@ app.post('/verifyemail', async (req, res) => {
         if (sender.money < numericAmount) {
             return res.status(400).json({ error: "Not enough money to send" });
         }
+        if (sender.money === 0) {
+            return res.status(400).json({ error: "Enter valid Amount" });
+        }
         const receiver = await User.findOne({ email: recieve });
         if (!receiver) {
             return res.status(404).json({ error: "Receiver not found" });
@@ -213,7 +212,7 @@ app.post('/verifyemail', async (req, res) => {
             mailOptions.subject = 'One Time Pawword';
             mailOptions.html = `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 2px solid #ccc; border-radius: 10px;">
-                <p style="font-size: 16px; margin-bottom: 20px;">Hello, this mail is for account verification</p>
+                <p style="font-size: 16px; margin-bottom: 20px;">Hello, this is your OTP for verification </p>
                 <div style="display: flex; justify-content: space-between; align-items: center; background-color: #f0f0f0; padding: 10px; border-radius: 5px;">
         
                   <!-- Use a loop to generate boxed style for each letter in OTP -->
@@ -244,40 +243,77 @@ app.post('/verifyemail', async (req, res) => {
 app.post("/checktop", async (req, res) => {
     const { email, recieve, amount, otp } = req.body;
     const numericAmount = parseFloat(amount);
+
     try {
         const user = await User.findOne({ email });
+
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
+
         if (user.verify === otp) {
             await User.findOneAndUpdate(
                 { email: recieve },
                 { $inc: { money: numericAmount } },
                 { new: true }
             );
+            const senderTransaction = new TransactionHistory({
+                senderemail: email,
+                receivermail: recieve,
+                amount: numericAmount,
+            });
 
+            await User.findOneAndUpdate(
+                { email },
+                {
+                    $push: {
+                        transactions: senderTransaction,
+                    },
+
+                },
+                { new: true }
+            );
             mailOptions.to = recieve;
-            mailOptions.subject = 'Transaction Allert';
+            mailOptions.subject = 'Transaction Alert';
             mailOptions.html = `
-              <div> <h1>Transaction Details</h1><b>
-              <p>You account has been creadited ${amount} rupees</p><b>
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+                <h1 style="color: #3498db; text-align: center;">Transaction Details</h1>
+                <p style="font-size: 16px; color: #555;">Your account has been credited ${amount} rupees.</p>
+                <p style="font-size: 14px; color: #777;">Thank you for choosing our services!</p>
               </div>
             `;
-            transporter.sendMail(mailOptions) 
+
+            transporter.sendMail(mailOptions);
             await User.findOneAndUpdate(
                 { email },
                 { $inc: { money: -numericAmount } },
                 { new: true }
             );
+            const receiverTransaction = new TransactionHistory({
+                senderemail: email,
+                receivermail: recieve,
+                amount: numericAmount,
+            });
+            await User.findOneAndUpdate(
+                { email: recieve },
+                {
+                    $push: {
+                        transactions: receiverTransaction,
+                    },
+
+                },
+                { new: true }
+            );
             mailOptions.to = email;
-            mailOptions.subject = 'Transaction Allert';
+            mailOptions.subject = 'Transaction Alert';
             mailOptions.html = `
-              <div> <h1>Transaction Details</h1><b>
-              <p>You account has been debited ${amount} rupees</p><b>
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+                <h1 style="color: #3498db; text-align: center;">Transaction Details</h1>
+                <p style="font-size: 16px; color: #555;">Your account has been debited ${amount} rupees.</p>
+                <p style="font-size: 14px; color: #777;">Thank you for choosing our services!</p>
               </div>
             `;
-            transporter.sendMail(mailOptions) 
-
+            transporter.sendMail(mailOptions);
         } else {
             return res.status(400).json({ error: 'OTP does not match' });
         }
@@ -287,6 +323,7 @@ app.post("/checktop", async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });

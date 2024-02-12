@@ -41,7 +41,6 @@ function Dashboard() {
     if (token) {
       setTokenpresent(true);
     }
-
     axios
       .post('http://localhost:3001/validateToken', { token })
       .then((response) => {
@@ -72,22 +71,22 @@ function Dashboard() {
         } else if (response.status === 404) {
           showError('Error: User not found');
         } else if (response.status === 400) {
-          showError(`Error: ${response.data.error}`);
+          showError(`${response.data.error}`);
         } else {
-          showError(`Unhandled status code: ${response.status}`);
+          showError(`${response.status}`);
         }
       })
       .catch(error => {
         try {
           if (error.response) {
-            showError(`Error: ${error.response.data.error}`);
+            showError(`${error.response.data.error}`);
           } else if (error.request) {
             showError('No response received');
           } else {
-            showError('Error:', error.message);
+            showError(error.message);
           }
         } catch (error) {
-          showError('Error:', error.message);
+          showError(error.message);
         }
       }
       )
@@ -100,7 +99,6 @@ function Dashboard() {
       setShowform(true);
     }
   };
-
   const handlesub = (e) => {
     e.preventDefault();
     const formData = {
@@ -135,9 +133,9 @@ function Dashboard() {
           <h1 className='text-center my-5'>Account Details</h1>
           <div className='container'>
             <div class='table-responsive'>
-              <table className='table table-hover'>
+              <table className='table table-hover table-bordered'>
                 <thead>
-                  <tr className='table-primary'>
+                  <tr className='table-success'>
                     <th className='text-start'>Name</th>
                     <th className='text-start'>Email</th>
                     <th className='text-start'>PAN</th>
@@ -236,9 +234,6 @@ function Dashboard() {
             ) : (
               <p></p>
             )}
-
-
-
           </div>
         </>
       ) : (

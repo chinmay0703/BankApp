@@ -102,7 +102,7 @@ function Signup() {
                             </div>
                             <div class="form-group">
                                 <label for="phone">Phone Number</label>
-                                <input type="text"
+                                <input type="number"
                                     value={phone} onChange={(e) => setPhone(e.target.value)}
                                     class="form-control" id="phone" placeholder="Enter 10 Digit no." />
                             </div>
