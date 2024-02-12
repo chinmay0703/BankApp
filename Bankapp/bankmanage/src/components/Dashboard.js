@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 function Dashboard() {
   const [formdata, setFormadata] = useState({});
+  const [tokenpresent, setTokenpresent] = useState(false);
   const [otp, setotp] = useState('');
   const [showform, setShowform] = useState(false);
   const [emailInput, setEmailInput] = useState('');
@@ -37,6 +38,10 @@ function Dashboard() {
   }, [otp]);
   const refreshuser = () => {
     const token = localStorage.getItem('Token');
+    if (token) {
+      setTokenpresent(true);
+    }
+
     axios
       .post('http://localhost:3001/validateToken', { token })
       .then((response) => {
@@ -48,8 +53,6 @@ function Dashboard() {
       });
 
   };
-
-
   const handlesubmit = (e) => {
     e.preventDefault();
     const formData = {
@@ -65,7 +68,7 @@ function Dashboard() {
           showInfo('Check your email!!!');
           setShowform(false);
           setOtpform(true);
-          
+
         } else if (response.status === 404) {
           showError('Error: User not found');
         } else if (response.status === 400) {
@@ -126,116 +129,125 @@ function Dashboard() {
     <div>
       <Nav />
       <Toast ref={toast} />
-      <h1 className='text-center my-5'>Account Details</h1>
-      <div className='container'>
-        <div class='table-responsive'>
-          <table className='table table-hover'>
-            <thead>
-              <tr className='table-primary'>
-                <th className='text-start'>Name</th>
-                <th className='text-start'>Email</th>
-                <th className='text-start'>PAN</th>
-                <th className='text-start'>Address</th>
-                <th className='text-start'>Account Balance</th>
-                <th className='text-start'>Account Number</th>
-                <th className='text-start'>Phone</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className='text-start'>{formdata.name}</td>
-                <td className='text-start'>{formdata.email}</td>
-                <td className='text-start'>{formdata.pan}</td>
-                <td className='text-start'>{formdata.address}</td>
-                <td className='text-start'>{formdata.money}</td>
-                <td className='text-start'>{formdata.accountno}</td>
-                <td className='text-start'>{formdata.phone}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
 
-        <div className='conatiner'>
-          <button className='btn btn-primary my-2' onClick={handleMakePayment}
-          >Make Payment</button>
-        </div>
+      {tokenpresent ? (
+        <>
+          <h1 className='text-center my-5'>Account Details</h1>
+          <div className='container'>
+            <div class='table-responsive'>
+              <table className='table table-hover'>
+                <thead>
+                  <tr className='table-primary'>
+                    <th className='text-start'>Name</th>
+                    <th className='text-start'>Email</th>
+                    <th className='text-start'>PAN</th>
+                    <th className='text-start'>Address</th>
+                    <th className='text-start'>Account Balance</th>
+                    <th className='text-start'>Account Number</th>
+                    <th className='text-start'>Phone</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className='text-start'>{formdata.name}</td>
+                    <td className='text-start'>{formdata.email}</td>
+                    <td className='text-start'>{formdata.pan}</td>
+                    <td className='text-start'>{formdata.address}</td>
+                    <td className='text-start'>{formdata.money}</td>
+                    <td className='text-start'>{formdata.accountno}</td>
+                    <td className='text-start'>{formdata.phone}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className='conatiner'>
+              <button className='btn btn-primary my-2' onClick={handleMakePayment}
+              >Make Payment</button>
+            </div>
+            {showform ? (
+              <div className='col-lg-6 col-sm-6 my-5 card'>
+                <h1 className='text-center my-3'>Make Payment</h1>
+                <form className='mx-3 my-3' onSubmit={handlesubmit}>
+                  <div className="form-group my-4">
+                    <label htmlFor="exampleInputEmail1">Email address</label>
+                    <input
+                      type="email"
+                      className="form-control"
+                      id="exampleInputEmail1"
+                      aria-describedby="emailHelp"
+                      placeholder="Enter email"
+                      name="email"
+                      value={formdata.email}
+                      disabled
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="exampleInputPassword1">Reciever's Email</label>
+                    <input
+                      type="email"
+                      className="form-control"
+                      id="email2"
+                      placeholder="Enter receiver's email"
+                      name="password"
+                      value={recieveremail}
+                      onChange={(e) => setRecieveremail(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="amount">Amount</label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      id="amount"
+                      placeholder="Enter Amount"
+                      name="amount"
+                      step="1"
+                      value={moneyvalue}
+                      onChange={(e) => setMoneyvalue(e.target.value)}
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-primary w-100 my-4">Submit</button>
+                </form>
+              </div>
+            ) : (<p></p>)}
 
-        {showform ? (
-          <div className='col-lg-6 col-sm-6 my-5 card'>
-            <h1 className='text-center my-3'>Make Payment</h1>
-            <form className='mx-3 my-3' onSubmit={handlesubmit}>
-              <div className="form-group my-4">
-                <label htmlFor="exampleInputEmail1">Email address</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  id="exampleInputEmail1"
-                  aria-describedby="emailHelp"
-                  placeholder="Enter email"
-                  name="email"
-                  value={formdata.email}
-                  disabled
-                />
+
+            {otpform ? (
+              <div>
+                <form className='mx-3 my-3' onSubmit={handlesub}>
+                  <div className="form-group my-4">
+                    <label htmlFor="otp">Enter OTP</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="otp"
+                      aria-describedby="otp"
+                      placeholder="Enter OTP"
+                      name="email"
+                      value={otp}
+                      onChange={(e) => setotp(e.target.value)}
+                    />
+                  </div>
+                  <button type="submit" className='btn btn-primary my-2'>submit</button>
+                </form>
+
               </div>
-              <div className="form-group">
-                <label htmlFor="exampleInputPassword1">Reciever's Email</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  id="email2"
-                  placeholder="Enter receiver's email"
-                  name="password"
-                  value={recieveremail}
-                  onChange={(e) => setRecieveremail(e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="amount">Amount</label>
-                <input
-                  type="number"
-                  className="form-control"
-                  id="amount"
-                  placeholder="Enter Amount"
-                  name="amount"
-                  step="1"
-                  value={moneyvalue}
-                  onChange={(e) => setMoneyvalue(e.target.value)}
-                />
-              </div>
-              <button type="submit" className="btn btn-primary w-100 my-4">Submit</button>
-            </form>
+
+            ) : (
+              <p></p>
+            )}
+
+
+
           </div>
-        ) : (<p></p>)}
-
-
-        {otpform ? (
-          <div>
-            <form className='mx-3 my-3' onSubmit={handlesub}>
-              <div className="form-group my-4">
-                <label htmlFor="otp">Enter OTP</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="otp"
-                  aria-describedby="otp"
-                  placeholder="Enter OTP"
-                  name="email"
-                  value={otp}
-                  onChange={(e) => setotp(e.target.value)}
-                />
-              </div>
-              <button type="submit" className='btn btn-primary my-2'>submit</button>
-            </form>
-
+        </>
+      ) : (
+        <>
+          <div className='container container-fluid my-5 py-5'>
+            <p className='text-center my-5'>Please <a href='/login'>Login</a></p>  
           </div>
-
-        ) : (
-          <p></p>
-        )}
-
-
-
-      </div>
+        </>
+      )}
       <Footer />
     </div >
   );

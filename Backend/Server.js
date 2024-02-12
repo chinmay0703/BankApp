@@ -71,10 +71,10 @@ function randomnumber(length) {
 }
 const User = mongoose.model('Users', userSchema);
 const TransactionHistory = mongoose.model('TransactionHistory', transactionSchema);
+var jwtSecretKey = process.env.JWT_SECRET_KEY;
+var tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
 app.use(cors());
 app.use(bodyParser.json());
-
-
 app.post('/postdata', async (req, res) => {
     try {
         const { name, email, pan, address, phone, password, money } = req.body;
@@ -134,8 +134,7 @@ app.get('/getall', async (req, res) => {
     const users = await User.find();
     res.status(200).json(users);
 });
-var jwtSecretKey = process.env.JWT_SECRET_KEY;
-var tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
+
 app.post('/auntheticatelogin', async (req, res) => {
     const { email, password } = req.body;
     console.log(email);
@@ -256,11 +255,29 @@ app.post("/checktop", async (req, res) => {
                 { $inc: { money: numericAmount } },
                 { new: true }
             );
+
+            mailOptions.to = recieve;
+            mailOptions.subject = 'Transaction Allert';
+            mailOptions.html = `
+              <div> <h1>Transaction Details</h1><b>
+              <p>You account has been creadited ${amount} rupees</p><b>
+              </div>
+            `;
+            transporter.sendMail(mailOptions) 
             await User.findOneAndUpdate(
                 { email },
                 { $inc: { money: -numericAmount } },
                 { new: true }
             );
+            mailOptions.to = email;
+            mailOptions.subject = 'Transaction Allert';
+            mailOptions.html = `
+              <div> <h1>Transaction Details</h1><b>
+              <p>You account has been debited ${amount} rupees</p><b>
+              </div>
+            `;
+            transporter.sendMail(mailOptions) 
+
         } else {
             return res.status(400).json({ error: 'OTP does not match' });
         }
