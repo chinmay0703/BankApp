@@ -125,7 +125,7 @@ function Dashboard() {
 
   return (
     <div>
-      <Nav />
+      <Nav  />
       <Toast ref={toast} />
 
       {tokenpresent ? (

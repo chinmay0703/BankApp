@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-
+import axios from'axios';
 function Nav() {
-
+    const [formdata, setFormadata] = useState({});
     const [token, setToken] = useState('');
+    const [tokenpresent,setTokenpresent]=useState(false);
 
     const handlelogout = () => {
         localStorage.removeItem('Token');
@@ -12,6 +13,29 @@ function Nav() {
     useEffect(() => {
         setToken(localStorage.getItem('Token'));
     }, []);
+
+
+
+    useEffect(() => {
+        refreshuser();
+    }, []);
+
+    const refreshuser = () => {
+        const token = localStorage.getItem('Token');
+        if (token) {
+            setTokenpresent(true);
+        }
+        axios
+            .post('http://localhost:3001/validateToken', { token })
+            .then((response) => {
+                setFormadata(response.data.user);
+                console.log('Response:', response.data);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+
+    };
 
 
     return (
@@ -28,6 +52,7 @@ function Nav() {
                             <li class="nav-item">
                                 <a class="nav-link active text-white" aria-current="page" href="/">Home</a>
                             </li>
+                            
                             <li class="nav-item">
                                 <a class="nav-link active text-white" aria-current="page" href="/dashboard">Menu</a>
                             </li>
@@ -35,12 +60,13 @@ function Nav() {
                         <form class="d-flex" role="search">
                             {token ? (
                                 <>
+                                <p className='text-white my-1'><b>Account No:</b>{formdata.accountno}</p>
                                     <Link to="/">
                                         <button className="btn btn-danger mx-2" type="button" onClick={handlelogout}>
                                             Logout
                                         </button>
                                     </Link>
-                                    <Link to="/transactions" style={{textDecoration:"none"}}>
+                                    <Link to="/transactions" style={{ textDecoration: "none" }}>
                                         <button className='btn btn-success'>Transactions</button>
                                     </Link>
                                 </>
