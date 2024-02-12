@@ -44,7 +44,7 @@ function Signup() {
                 pan,
                 address,
                 phone,
-                money: "1000",
+                money: 1000,
                 accountno,
             };
             try {

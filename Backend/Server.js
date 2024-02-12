@@ -13,6 +13,16 @@ const app = express();
 const port = 3001;
 mongoose.connect('mongodb+srv://chinmay:LIP54dqmq0o0dODS@contact.cjo104s.mongodb.net/?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true });
 
+
+
+
+const transactionSchema = new mongoose.Schema({
+    date: { type: Date, default: Date.now },
+    senderemail: String,
+    receivermail:String,
+    amount: Number,
+});
+
 const userSchema = new mongoose.Schema({
     name: String,
     email: String,
@@ -21,10 +31,10 @@ const userSchema = new mongoose.Schema({
     phone: String,
     password: String,
     accountno: String,
-    money: String,
-    verify:String,
+    money: Number,
+    verify: String,
+    transactions: { type: [transactionSchema], default: [] },
 });
-
 const workFactor = 10;
 const hashPassword = async (password) => {
     console.log(password)
@@ -43,9 +53,8 @@ const transporter = nodemailer.createTransport({
         pass: "aholwnnxmhbhubdx",
     },
 });
-
 const mailOptions = {
-    from: '"CTC Bank" <chinya2103@gmail.com>',
+    from: '"CTC Bank" <ctcbank@gmail.com>',
     subject: "Account Creation Notification",
     to: " ",
     text: "Hello signup successfully"
@@ -61,9 +70,11 @@ function randomnumber(length) {
     return result;
 }
 const User = mongoose.model('Users', userSchema);
-
+const TransactionHistory = mongoose.model('TransactionHistory', transactionSchema);
 app.use(cors());
 app.use(bodyParser.json());
+
+
 app.post('/postdata', async (req, res) => {
     try {
         const { name, email, pan, address, phone, password, money } = req.body;
@@ -83,37 +94,48 @@ app.post('/postdata', async (req, res) => {
             password: hashedPassword,
             accountno,
             money,
-            verify,
+            verify: 53146,
         });
         await newUser.save();
-        mailOptions.to = newUser.email;
-        mailOptions.text = `Hello ${name},your account has been created!`;
-        mailOptions.html = `<b>Hello ${name},</b><br>Your account has been created  `;
+        const mailOptions = {
+            to: newUser.email,
+            subject: 'Welcome to Our Exclusive Platform',
+            text: `Dear ${name},\n\nGreetings! We are thrilled to welcome you to our exclusive platform. Your account has been successfully created, and you are now part of a community committed to excellence.`,
+            html: `
+                <p style="font-size: 16px; color: #333; line-height: 1.6;">
+                    <b>Dear ${name},</b>
+                </p>
+                <p style="font-size: 16px; color: #333; line-height: 1.6;">
+                    Greetings! We are thrilled to welcome you to our exclusive platform. Your account has been successfully created, and you are now part of a community committed to excellence.
+                </p>
+                <p style="font-size: 16px; color: #333; line-height: 1.6;">
+                    Best regards,
+                    <br>
+                    CTC BANK
+                </p>
+            `,
+        };
+
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 console.log(error);
             } else {
                 console.log("Email sent successfully");
-                console.log('Email sent:'+ info.response);
+                console.log('Email sent:' + info.response);
             }
         });
         res.status(200).json({ message: 'User data successfully saved to MongoDB!' });
-
     } catch (error) {
         console.error('Error adding user:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
-
-
 app.get('/getall', async (req, res) => {
     const users = await User.find();
     res.status(200).json(users);
 });
-
 var jwtSecretKey = process.env.JWT_SECRET_KEY;
 var tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
-
 app.post('/auntheticatelogin', async (req, res) => {
     const { email, password } = req.body;
     console.log(email);
@@ -165,36 +187,89 @@ app.post("/validateToken", async (req, res) => {
     }
 });
 app.post('/verifyemail', async (req, res) => {
-    const { email } = req.body;
-    console.log(email);
-    const user = await User.findOne({ email });
-    if (user) {
-        console.log('User found:', user);
-    } else {
-        console.log('User not found');
+    const { email, recieve, amount } = req.body;
+    const numericAmount = parseFloat(amount);
+    if (email === recieve) {
+        return res.status(400).json({ error: "Sender's and receiver's emails cannot be the same" });
     }
-    if (user) {
-
-        const ver=randomnumber(10);
+    try {
+        const sender = await User.findOne({ email });
+        if (!sender) {
+            return res.status(404).json({ error: "Sender not found" });
+        }
+        if (sender.money < numericAmount) {
+            return res.status(400).json({ error: "Not enough money to send" });
+        }
+        const receiver = await User.findOne({ email: recieve });
+        if (!receiver) {
+            return res.status(404).json({ error: "Receiver not found" });
+        } else {
+            const randNumber = randomnumber(4);
+            await User.findOneAndUpdate(
+                { email },
+                { verify: randNumber },
+                { new: true }
+            );
+            mailOptions.to = email;
+            mailOptions.subject = 'One Time Pawword';
+            mailOptions.html = `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 2px solid #ccc; border-radius: 10px;">
+                <p style="font-size: 16px; margin-bottom: 20px;">Hello, this mail is for account verification</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; background-color: #f0f0f0; padding: 10px; border-radius: 5px;">
         
-        console.log(user)
-        mailOptions.to = email;
-        mailOptions.subject = `Account Verification Required`;
-        mailOptions.text = `Hello ${user.name}`;
-        mailOptions.html = `<b>This is an official mail for verification this is your OTP `;
-        transporter.sendMail(mailOptions, function (error, info) {
-            if (error) {
-                console.log(error);
-            } else {
-                console.log("Email sent successfully");
-                console.log('Email sent:' + info.response);
-            }
-        });
+                  <!-- Use a loop to generate boxed style for each letter in OTP -->
+                  ${randNumber.split('').map(letter => `
+                    <div style="width: 30px; height: 30px; border: 1px solid #ccc; text-align: center; line-height: 30px; font-size: 18px; border-radius: 5px;">
+                      ${letter}
+                    </div>
+                  `).join('')}
+                  
+                </div>
+              </div>
+            `;
+            transporter.sendMail(mailOptions, function (error, info) {
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log("Email sent successfully");
+                    console.log('Email sent:' + info.response);
+                }
+            });
+        }
+        res.status(200).json({ message: 'Verification email sent successfully' });
+    } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
-
-
-
+app.post("/checktop", async (req, res) => {
+    const { email, recieve, amount, otp } = req.body;
+    const numericAmount = parseFloat(amount);
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        if (user.verify === otp) {
+            await User.findOneAndUpdate(
+                { email: recieve },
+                { $inc: { money: numericAmount } },
+                { new: true }
+            );
+            await User.findOneAndUpdate(
+                { email },
+                { $inc: { money: -numericAmount } },
+                { new: true }
+            );
+        } else {
+            return res.status(400).json({ error: 'OTP does not match' });
+        }
+        res.status(200).json({ message: 'Transaction successful' });
+    } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
