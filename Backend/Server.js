@@ -2,14 +2,15 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
+const { hashPassword } = require('./Hashpassword');
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 dotenv.config();
 var nodemailer = require('nodemailer');
 const cors = require('cors');
 const app = express();
-
 const port = 3001;
+
 mongoose.connect('mongodb+srv://chinmay:LIP54dqmq0o0dODS@contact.cjo104s.mongodb.net/?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true });
 
 const transactionSchema = new mongoose.Schema({
@@ -31,17 +32,17 @@ const userSchema = new mongoose.Schema({
     verify: String,
     transactions: { type: [transactionSchema], default: [] },
 });
-const workFactor = 10;
-const hashPassword = async (password) => {
-    console.log(password)
-    try {
-        const salt = await bcrypt.genSalt(workFactor);
-        const hash = await bcrypt.hash(password, salt);
-        return hash;
-    } catch (error) {
-        throw new Error("Hashing failed");
-    }
-};
+
+// const hashPassword = async (password) => {
+//     console.log(password)
+//     try {
+//         const salt = await bcrypt.genSalt(workFactor);
+//         const hash = await bcrypt.hash(password, salt);
+//         return hash;
+//     } catch (error) {
+//         throw new Error("Hashing failed");
+//     }
+// };
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -71,6 +72,9 @@ var jwtSecretKey = process.env.JWT_SECRET_KEY;
 var tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
 app.use(cors());
 app.use(bodyParser.json());
+
+// Signup
+
 app.post('/postdata', async (req, res) => {
     try {
         const { name, email, pan, address, phone, password, money } = req.body;
@@ -126,11 +130,14 @@ app.post('/postdata', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+// Get all users
 app.get('/getall', async (req, res) => {
     const users = await User.find();
     res.status(200).json(users);
 });
 
+// Login
 app.post('/auntheticatelogin', async (req, res) => {
     const { email, password } = req.body;
     console.log(email);
@@ -163,6 +170,8 @@ app.post('/auntheticatelogin', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+// VAlidate Token and extract the userid from token user._id
 app.post("/validateToken", async (req, res) => {
     try {
         const { token } = req.body;
@@ -181,6 +190,11 @@ app.post("/validateToken", async (req, res) => {
         res.status(401).json({ error: 'Token verification failed' });
     }
 });
+
+// Validate the sender
+// Validate the reciever
+// Validate the amount check if it less than 0 or 0 or the amount is present in the senders acount
+//  if all this checked 4 digit otp is created and sent to the db and also to email
 app.post('/verifyemail', async (req, res) => {
     const { email, recieve, amount } = req.body;
     const numericAmount = parseFloat(amount);
@@ -240,6 +254,9 @@ app.post('/verifyemail', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+//  checked the otp matched with the db 
+//  If matches Transaction will be successfull
 app.post("/checktop", async (req, res) => {
     const { email, recieve, amount, otp } = req.body;
     const numericAmount = parseFloat(amount);

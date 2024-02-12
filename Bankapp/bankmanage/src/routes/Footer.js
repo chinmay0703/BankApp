@@ -3,7 +3,6 @@ import '../routes/footer.css'
 function Footer() {
     return (
         <div>
-
             <footer class="footer-section ">
                 <div class="container">
                     <div class="footer-cta pt-5 pb-5">
@@ -99,7 +98,7 @@ function Footer() {
                         <div class="row">
                             <div class="col-xl-6 col-lg-6 text-center text-lg-left">
                                 <div class="copyright-text">
-                                    <p>Copyright &copy; 2018, All Right Reserved <a href="https://codepen.io/anupkumar92/">Anup</a></p>
+                                    <p>Copyright &copy; 2018, All Right Reserved <a href="/">chinmay</a></p>
                                 </div>
                             </div>
                             <div class="col-xl-6 col-lg-6 d-none d-lg-block text-right">
