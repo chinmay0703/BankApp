@@ -33,16 +33,6 @@ const userSchema = new mongoose.Schema({
     transactions: { type: [transactionSchema], default: [] },
 });
 
-// const hashPassword = async (password) => {
-//     console.log(password)
-//     try {
-//         const salt = await bcrypt.genSalt(workFactor);
-//         const hash = await bcrypt.hash(password, salt);
-//         return hash;
-//     } catch (error) {
-//         throw new Error("Hashing failed");
-//     }
-// };
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -66,18 +56,36 @@ function randomnumber(length) {
     }
     return result;
 }
+
+function randomnumberonly(length) {
+    const characters = '1234567890';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        result += characters.charAt(randomIndex);
+    }
+    return result;
+}
+
+
+
+
 const User = mongoose.model('Users', userSchema);
 const TransactionHistory = mongoose.model('TransactionHistory', transactionSchema);
+
 var jwtSecretKey = process.env.JWT_SECRET_KEY;
 var tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
 app.use(cors());
 app.use(bodyParser.json());
 
 // Signup
-
 app.post('/postdata', async (req, res) => {
     try {
         const { name, email, pan, address, phone, password, money } = req.body;
+        console.log(email);
+        if (!/\S+@\S+\.\S+/.test(email)) {
+            return res.status(402).json({ error: 'Enter a valid email, please' });
+        }
         const existingUser = await User.findOne({ email: email });
         if (existingUser) {
             console.log("Email found");
@@ -115,7 +123,6 @@ app.post('/postdata', async (req, res) => {
                 </p>
             `,
         };
-
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 console.log(error);
@@ -135,6 +142,22 @@ app.post('/postdata', async (req, res) => {
 app.get('/getall', async (req, res) => {
     const users = await User.find();
     res.status(200).json(users);
+});
+
+// Delete all user
+
+app.delete('/deleteallusers', async (req, res) => {
+    try {
+        const result = await User.deleteMany({});
+        if (result.deletedCount > 0) {
+            res.status(200).json({ message: 'All users deleted successfully.' });
+        } else {
+            res.status(404).json({ message: 'No users found to delete.' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
 });
 
 // Login
@@ -198,8 +221,15 @@ app.post("/validateToken", async (req, res) => {
 app.post('/verifyemail', async (req, res) => {
     const { email, recieve, amount } = req.body;
     const numericAmount = parseFloat(amount);
+    console.log(numericAmount)
     if (email === recieve) {
-        return res.status(400).json({ error: "Sender's and receiver's emails cannot be the same" });
+        return res.status(400).json({ error: "You can't send money to your own account. Please choose a different recipient." });
+    }
+    if (numericAmount < 0) {
+        return res.status(400).json({ error: "Please Enter Valid Amount" });
+    }
+    if (numericAmount === 0) {
+        return res.status(400).json({ error: "Enter Valid Amount" });
     }
     try {
         const sender = await User.findOne({ email });
@@ -216,7 +246,7 @@ app.post('/verifyemail', async (req, res) => {
         if (!receiver) {
             return res.status(404).json({ error: "Receiver not found" });
         } else {
-            const randNumber = randomnumber(4);
+            const randNumber = randomnumberonly(4);
             await User.findOneAndUpdate(
                 { email },
                 { verify: randNumber },
