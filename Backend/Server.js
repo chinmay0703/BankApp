@@ -8,6 +8,12 @@ const jwt = require('jsonwebtoken');
 dotenv.config();
 var nodemailer = require('nodemailer');
 const cors = require('cors');
+app.use(cors(
+{
+origin: ["https://deploy-mern-1whq.vercel.app"], methods: ["POST", "GET"],
+credentials: true
+}
+));
 const app = express();
 const port = 3001;
 
