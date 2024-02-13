@@ -10,11 +10,11 @@ ul {
 .footer-cta {
   border-bottom: 1px solid #373636;
 }
-.single-cta i {
+.single-cta{
   color: #ff5e14;
   font-size: 30px;
   float: left;
-  margin-top: 8px;
+  margin-top: 0px;
 }
 .cta-text {
   padding-left: 15px;
@@ -44,6 +44,8 @@ ul {
 }
 .footer-logo {
   margin-bottom: 30px;
+
+ 
 }
 .footer-logo img {
     max-width: 200px;

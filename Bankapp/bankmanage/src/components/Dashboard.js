@@ -1,21 +1,19 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import Nav from '../routes/Nav';
 import Footer from '../routes/Footer';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+
 
 function Dashboard() {
   const [formdata, setFormadata] = useState({});
   const [tokenpresent, setTokenpresent] = useState(false);
   const [otp, setotp] = useState('');
   const [showform, setShowform] = useState(false);
-  const [emailInput, setEmailInput] = useState('');
   const [recieveremail, setRecieveremail] = useState('');
   const [moneyvalue, setMoneyvalue] = useState('');
   const [otpform, setOtpform] = useState(false);
-  const navigate = useNavigate();
   const toast = useRef(null);
   const showSuccess = (errorDetail) => {
     toast.current.show({ severity: 'success', summary: 'Transaction Done', detail: errorDetail, life: 3000 });
@@ -25,9 +23,9 @@ function Dashboard() {
     toast.current.show({ severity: 'info', summary: 'Info', detail: errorDetail, life: 3000 });
   }
 
-  const showWarn = (errorDetail) => {
-    toast.current.show({ severity: 'warn', summary: 'Warning', detail: errorDetail, life: 3000 });
-  }
+  // const showWarn = (errorDetail) => {
+  //   toast.current.show({ severity: 'warn', summary: 'Warning', detail: errorDetail, life: 3000 });
+  // }
 
   const showError = (errorDetail) => {
     toast.current.show({ severity: 'error', summary: 'Try again', detail: errorDetail, life: 3000 });
@@ -54,6 +52,14 @@ function Dashboard() {
   };
   const handlesubmit = (e) => {
     e.preventDefault();
+    if (!recieveremail) {
+      showError("Please Enter Recievers email");
+      return;
+    }
+    if (!moneyvalue) {
+      showError("Please Enter Amount You want to send ");
+      return
+    }
     const formData = {
       email: formdata.email,
       recieve: recieveremail,
@@ -67,7 +73,6 @@ function Dashboard() {
           showInfo('Check your email!!!');
           setShowform(false);
           setOtpform(true);
-
         } else if (response.status === 404) {
           showError('Error: User not found');
         } else if (response.status === 400) {
@@ -112,6 +117,10 @@ function Dashboard() {
         console.log(response.data);
         if (response.data && response.data.message === 'Transaction successful') {
           setOtpform(false);
+          setotp('');
+          setMoneyvalue('');
+          setRecieveremail('');
+
           refreshuser();
           showSuccess("Transaction successful");
         } else {
@@ -125,7 +134,7 @@ function Dashboard() {
 
   return (
     <div>
-      <Nav  />
+      <Nav />
       <Toast ref={toast} />
 
       {tokenpresent ? (
@@ -199,22 +208,26 @@ function Dashboard() {
                       id="amount"
                       placeholder="Enter Amount"
                       name="amount"
-                      step="1"
                       value={moneyvalue}
-                      onChange={(e) => setMoneyvalue(e.target.value)}
+                      step="0.01"
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        const regex = /^\d*\.?\d{0,2}$/;
+                        if (regex.test(inputValue)) {
+                          setMoneyvalue(inputValue);
+                        }
+                      }}
                     />
                   </div>
                   <button type="submit" className="btn btn-primary w-100 my-4">Submit</button>
                 </form>
               </div>
             ) : (<p></p>)}
-
-
             {otpform ? (
-              <div>
+              <div style={{ maxWidth: '400px', margin: 'auto', padding: '20px', border: '1px solid #ddd', borderRadius: '8px' }} className='my-3'>
                 <form className='mx-3 my-3' onSubmit={handlesub}>
                   <div className="form-group my-4">
-                    <label htmlFor="otp">Enter OTP</label>
+                    <label htmlFor="otp" className='my-2'>Enter OTP</label>
                     <input
                       type="text"
                       className="form-control"
@@ -224,11 +237,11 @@ function Dashboard() {
                       name="email"
                       value={otp}
                       onChange={(e) => setotp(e.target.value)}
+                      style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
                     />
                   </div>
-                  <button type="submit" className='btn btn-primary my-2'>submit</button>
+                  <button type="submit" className='btn btn-primary ' style={{ width: '100%', padding: '10px', borderRadius: '4px', background: '#007bff', color: '#fff' }}>Submit</button>
                 </form>
-
               </div>
 
             ) : (
@@ -239,7 +252,8 @@ function Dashboard() {
       ) : (
         <>
           <div className='container container-fluid my-5 py-5'>
-            <p className='text-center my-5'>Please <a href='/login'>Login</a></p>  
+
+            <p className='text-center'>Please <Link to={"/login"} style={{ textDecoration: 'none' }}> Login</Link></p>
           </div>
         </>
       )}

@@ -8,8 +8,6 @@ function Transactions() {
     const [formdata, setFormadata] = useState([]);
     const [tokenPresent, setTokenPresent] = useState(false);
     const [totaltransaction, setTotaltransaction] = useState(false);
-
-
     useEffect(() => {
         refreshUser();
     }, []);
@@ -29,7 +27,6 @@ function Transactions() {
                 console.error(error);
             });
     };
-
     return (
         <div>
             <Nav />

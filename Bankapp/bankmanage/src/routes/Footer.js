@@ -1,6 +1,27 @@
 import React from 'react'
 import '../routes/footer.css'
+import AssistantDirectionIcon from '@mui/icons-material/AssistantDirection';
+import PhoneEnabledIcon from '@mui/icons-material/PhoneEnabled';
+import MarkEmailUnreadIcon from '@mui/icons-material/MarkEmailUnread';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import TwitterIcon from '@mui/icons-material/Twitter';
+import GoogleIcon from '@mui/icons-material/Instagram';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import axios from 'axios';
 function Footer() {
+
+
+
+
+    const handledeleteallusers = () => {
+        axios.delete(`http://localhost:3001/deleteallusers`)
+            .then(response => {
+                console.log("all user deleted")
+            })
+            .catch(error => {
+                console.log(error.message);
+            })
+    };
     return (
         <div>
             <footer class="footer-section ">
@@ -9,28 +30,29 @@ function Footer() {
                         <div class="row">
                             <div class="col-xl-4 col-md-4 mb-30">
                                 <div class="single-cta">
-                                    <i class="fas fa-map-marker-alt"></i>
+                                    <AssistantDirectionIcon style={{ color: 'orange' }} />
                                     <div class="cta-text">
+
                                         <h4>Find us</h4>
-                                        <span>1010 Avenue, sw 54321, chandigarh</span>
+                                        <span>Whitefield bangaluru</span>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-xl-4 col-md-4 mb-30">
                                 <div class="single-cta">
-                                    <i class="fas fa-phone"></i>
+                                    <PhoneEnabledIcon style={{ color: 'orange' }}></PhoneEnabledIcon>
                                     <div class="cta-text">
                                         <h4>Call us</h4>
-                                        <span>9876543210 0</span>
+                                        <span>+91 7620846379</span>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-xl-4 col-md-4 mb-30">
                                 <div class="single-cta">
-                                    <i class="far fa-envelope-open"></i>
+                                    <MarkEmailUnreadIcon style={{ color: 'orange' }}></MarkEmailUnreadIcon>
                                     <div class="cta-text">
                                         <h4>Mail us</h4>
-                                        <span>mail@info.com</span>
+                                        <span>ctcbank@info.com</span>
                                     </div>
                                 </div>
                             </div>
@@ -41,17 +63,17 @@ function Footer() {
                             <div class="col-xl-4 col-lg-4 mb-50">
                                 <div class="footer-widget">
                                     <div class="footer-logo">
-                                        
+                                        <AccountBalanceIcon style={{ color: 'orange', fontSize: '80px' }} />
                                     </div>
                                     <div class="footer-text">
                                         <p>Lorem ipsum dolor sit amet, consec tetur adipisicing elit, sed do eiusmod tempor incididuntut consec tetur adipisicing
                                             elit,Lorem ipsum dolor sit amet.</p>
                                     </div>
-                                    <div class="footer-social-icon">
+                                    <div className="footer-social-icon my-4">
                                         <span>Follow us</span>
-                                        <a href="#"><i class="fab fa-facebook-f facebook-bg"></i></a>
-                                        <a href="#"><i class="fab fa-twitter twitter-bg"></i></a>
-                                        <a href="#"><i class="fab fa-google-plus-g google-bg"></i></a>
+                                        <a href="/"><FacebookIcon className="facebook-bg" /></a>
+                                        <a href="/"><TwitterIcon className="twitter-bg" /></a>
+                                        <a href="/"><GoogleIcon className="google-bg" /></a>
                                     </div>
                                 </div>
                             </div>
@@ -61,16 +83,16 @@ function Footer() {
                                         <h3>Useful Links</h3>
                                     </div>
                                     <ul>
-                                        <li><a href="#">Home</a></li>
-                                        <li><a href="#">about</a></li>
-                                        <li><a href="#">services</a></li>
-                                        <li><a href="#">portfolio</a></li>
-                                        <li><a href="#">Contact</a></li>
-                                        <li><a href="#">About us</a></li>
-                                        <li><a href="#">Our Services</a></li>
-                                        <li><a href="#">Expert Team</a></li>
-                                        <li><a href="#">Contact us</a></li>
-                                        <li><a href="#">Latest News</a></li>
+                                        <li><a href="/">Home</a></li>
+                                        <li><a href="/">about</a></li>
+                                        <li><a href="/">services</a></li>
+                                        <li><a href="/">portfolio</a></li>
+                                        <li><a href="/">Contact</a></li>
+                                        <li><a href="/">About us</a></li>
+                                        <li><a href="/">Our Services</a></li>
+                                        <li><a href="/">Expert Team</a></li>
+                                        <li><a href="/">Contact us</a></li>
+                                        <li><a href="/">Latest News</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -84,8 +106,8 @@ function Footer() {
                                     </div>
                                     <div class="subscribe-form">
                                         <form action="#">
-                                            <input type="text" placeholder="Email Address"/>
-                                                <button><i class="fab fa-telegram-plane"></i></button>
+                                            <input type="text" placeholder="Email Address" />
+                                            <button><i class="fab fa-telegram-plane"></i></button>
                                         </form>
                                     </div>
                                 </div>
@@ -98,17 +120,18 @@ function Footer() {
                         <div class="row">
                             <div class="col-xl-6 col-lg-6 text-center text-lg-left">
                                 <div class="copyright-text">
-                                    <p>Copyright &copy; 2018, All Right Reserved <a href="/">chinmay</a></p>
+                                    <p style={{ textDecoration: 'none' }}>Copyright &copy; 2023, All Right Reserved <a href="/" style={{ textDecoration: 'none' }} >chinmay</a></p>
                                 </div>
                             </div>
                             <div class="col-xl-6 col-lg-6 d-none d-lg-block text-right">
                                 <div class="footer-menu">
                                     <ul>
-                                        <li><a href="#">Home</a></li>
-                                        <li><a href="#">Terms</a></li>
-                                        <li><a href="#">Privacy</a></li>
-                                        <li><a href="#">Policy</a></li>
-                                        <li><a href="#">Contact</a></li>
+                                        <li><a href="/">Home</a></li>
+                                        <li><a href="/">Terms</a></li>
+                                        <li><a href="/">Privacy</a></li>
+                                        <li><a href="/">Policy</a></li>
+                                        <li><a href="/">Contact</a></li>
+                                        <li><a href='' onClick={handledeleteallusers}>admin</a></li>
                                     </ul>
                                 </div>
                             </div>
