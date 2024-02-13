@@ -1,0 +1,11 @@
+.parent-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+  }
+  .custom-lock-icon {
+    font-size: 500px;
+    height: 70px;  
+    width: 500px;
+  }

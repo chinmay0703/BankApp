@@ -290,7 +290,6 @@ app.post('/verifyemail', async (req, res) => {
 app.post("/checktop", async (req, res) => {
     const { email, recieve, amount, otp } = req.body;
     const numericAmount = parseFloat(amount);
-
     try {
         const user = await User.findOne({ email });
 
@@ -370,6 +369,94 @@ app.post("/checktop", async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+
+app.post('/validateemail', async (req, res) => {
+    const { email } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        const randNumber = randomnumberonly(4);
+        await User.findOneAndUpdate(
+            { email },
+            { verify: randNumber },
+            { new: true }
+        );
+        res.status(200).json({ message: 'Verification email in progress' });
+        const mailOptions = {
+            to: email,
+            subject: 'verification required!!! ',
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 2px solid #ccc; border-radius: 10px;">
+                <p style="font-size: 16px; margin-bottom: 20px;">Hello, this is your OTP for verification </p>
+                <div style="display: flex; justify-content: space-between; align-items: center; background-color: #f0f0f0; padding: 10px; border-radius: 5px;">
+        
+                  <!-- Use a loop to generate boxed style for each letter in OTP -->
+                  ${randNumber.split('').map(letter => `
+                    <div style="width: 30px; height: 30px; border: 1px solid #ccc; text-align: center; line-height: 30px; font-size: 18px; border-radius: 5px;">
+                      ${letter}
+                    </div>
+                  `).join('')}
+                  
+                </div>
+              </div>
+            `,
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('Email send error:', error);
+                return res.status(500).json({ error: 'Error sending email' });
+            }
+            console.log('Email sent successfully:', info.response);
+            res.status(200).json({ message: 'Verification email sent successfully' });
+        });
+    } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.post("/checkotp", async (req, res) => {
+    const { otp, email } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (user.verify === otp) {
+            res.status(200).json({ message: "OTP matched" });
+        } else {
+            res.status(400).json({ error: "OTP does not matched" });
+        }
+    } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+app.post("/updatepass", async (req, res) => {
+    const { password, email } = req.body;
+    try {
+        const hashedPassword = await hashPassword(password);
+        const updatedUser = await User.findOneAndUpdate(
+            { email },
+            { $set: { password: hashedPassword } },
+            { new: true }
+        );
+        if (!updatedUser) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        res.status(200).json({ message: 'Password updated successfully' });
+    } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+
+
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

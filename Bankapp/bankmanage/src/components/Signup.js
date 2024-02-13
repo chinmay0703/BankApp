@@ -4,12 +4,9 @@ import Nav from '../routes/Nav'
 import Footer from '../routes/Footer'
 import { Password } from 'primereact/password';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Divider } from 'primereact/divider';
 function Signup() {
-
-
-
     const header = <div className="font-bold mb-3">Pick a password</div>;
     const footer = (
         <>
@@ -23,22 +20,10 @@ function Signup() {
             </ul>
         </>
     );
-
-
     const toast = useRef(null);
-
     const showSuccess = () => {
         toast.current.show({ severity: 'success', summary: 'Signup Successfully', detail: 'Please login Now', life: 3000 });
     }
-
-    // const showInfo = () => {
-    //     toast.current.show({ severity: 'info', summary: 'Info', detail: 'Message Content', life: 3000 });
-    // }
-
-    // const showWarn = () => {
-    //     toast.current.show({ severity: 'warn', summary: 'Warning', detail: 'Message Content', life: 3000 });
-    // }
-
     const showError = (er) => {
         toast.current.show({ severity: 'error', summary: 'Error', detail: er, life: 3000 });
     }
@@ -88,17 +73,16 @@ function Signup() {
             } catch (error) {
                 if (error.response) {
                     showError(`${error.response.data.error}`);
-                  } else if (error.request) {
+                } else if (error.request) {
                     showError('No response received');
-                  } else {
+                } else {
                     showError(error.message);
-                  }
+                }
             }
         } else {
             showError("Password Doesn't Match");
         }
     };
-
     return (
         <div>
             <Nav></Nav>
@@ -125,7 +109,6 @@ function Signup() {
                                     placeholder="Enter Valid Email Address"
                                     required
                                     value={email} onChange={(e) => setEmail(e.target.value)} />
-
                             </div>
                             <div class="form-group">
                                 <label for="pan1">PAN no.</label>
@@ -180,12 +163,12 @@ function Signup() {
                                                 feedback={false}
                                                 placeholder='Re enter Password'
                                                 required
-
                                             />
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <strong >Already have an account,<Link style={{ textDecoration: 'none' }} to={"/login"}> Sign In</Link></strong>
                             <button type="submit" onClick={handlesubmit} class="btn btn-primary w-100 my-3">Submit</button>
                         </form>
                     </div>

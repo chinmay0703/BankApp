@@ -5,7 +5,7 @@ import axios from 'axios';
 import '../components/login.css';
 import Nav from '../routes/Nav';
 import Footer from '../routes/Footer';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Login() {
     const [formData, setFormData] = useState({
@@ -111,6 +111,7 @@ function Login() {
                             <small id="emailHelp" class="form-text text-muted">We'll never share your Password.</small>
                             <p className='my-2'>
                                 Please <a href='/signup' className='my-2' style={{ textDecoration: 'none' }}>Register!!</a> if not registered yet
+                             <p className='my-2'></p><Link style={{ textDecoration: 'none' }} to={"/forgotpassword"}>Recover</Link> your Password?
                             </p>
                             <button type="submit" className="btn btn-primary w-100 my-2">Submit</button>
                         </form>
