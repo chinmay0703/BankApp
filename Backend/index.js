@@ -11,14 +11,13 @@ dotenv.config();
 var nodemailer = require('nodemailer');
 const cors = require('cors');
 const app = express();
-const port = 3001;
-app.use(cors(
-    {
-        origin: ["*"], methods: ["POST", "GET"],
-        credentials: true
-    }
-));
-
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, GET');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    next();
+});
+const port = process.env.PORT || 3001;
 const mongodbURL = process.env.MONGODB_URL;
 mongoose.connect(mongodbURL, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
@@ -133,7 +132,7 @@ app.post('/postdata', async (req, res) => {
 
 // Get all users
 app.get('/', async (req, res) => {
-    
+
     res.json("Hello");
 });
 
