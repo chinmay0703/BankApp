@@ -94,8 +94,6 @@ function Login() {
                                     onChange={handleInputChange}
                                 />
                             </div>
-
-
                             <div className="form-group my-2">
                                 <label htmlFor="exampleInputPassword1">Password</label>
                                 <input
@@ -108,11 +106,11 @@ function Login() {
                                     onChange={handleInputChange}
                                 />
                             </div>
-                            <small id="emailHelp" class="form-text text-muted">We'll never share your Password.</small>
-                            <p className='my-2'>
-                                Please <a href='/signup' className='my-2' style={{ textDecoration: 'none' }}>Register!!</a> if not registered yet
+                            <strong id="emailHelp" className="form-text text-muted my-2">We'll never share your Password<br></br></strong><b></b>
+                            <strong className='my-4'>
+                                Please <a href='/signup' className='my-4' style={{ textDecoration: 'none' }}>Register!!</a> if not registered yet
                              <p className='my-2'></p><Link style={{ textDecoration: 'none' }} to={"/forgotpassword"}>Recover</Link> your Password?
-                            </p>
+                            </strong>
                             <button type="submit" className="btn btn-primary w-100 my-2">Submit</button>
                         </form>
                     </div>

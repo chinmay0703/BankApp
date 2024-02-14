@@ -6,10 +6,9 @@ import '../components/login.css';
 import Nav from '../routes/Nav';
 import Footer from '../routes/Footer';
 import { Link, useNavigate } from 'react-router-dom';
-import LockIcon from '@mui/icons-material/Lock';
 import { Password } from 'primereact/password';
 import { Divider } from 'primereact/divider';
-
+import 'primeicons/primeicons.css';
 function Forgotpassword() {
     const [showforgotform, setShowforgotform] = useState(true);
     const [otpmatched, setotpmatched] = useState(false);
@@ -33,10 +32,6 @@ function Forgotpassword() {
         toast.current.show({ severity: 'info', summary: 'Info', detail: eer, life: 3000 });
     }
 
-    // const showWarn = () => {
-    //     toast.current.show({ severity: 'warn', summary: 'Warning', detail: 'Message Content', life: 3000 });
-    // }
-
     const showError = (er) => {
         toast.current.show({ severity: 'error', summary: 'Try again', detail: er, life: 3000 });
     }
@@ -49,6 +44,11 @@ function Forgotpassword() {
         const emailRegex = /\S+@\S+\.\S+/;
         if (!emailRegex.test(emailverify)) {
             showError('Enter a valid email, please');
+            return;
+        }
+        var token = localStorage.getItem('Token');
+        if (token) {
+            showError("You are Allready Loged In");
             return;
         }
         try {
@@ -137,7 +137,7 @@ function Forgotpassword() {
                     setTimeout(() => {
                         navigate("/login");
                     }, 2000);
-                    
+
                 } else {
                     showError("Failed to update password");
                 }
@@ -147,7 +147,7 @@ function Forgotpassword() {
             showError("An unexpected error occurred");
         }
     };
-    
+
     return (
         <div>
             <Nav />
@@ -159,7 +159,21 @@ function Forgotpassword() {
                     </div>
                     <div className='col-lg-6 col-sm-6 my-5 card my-5'>
 
-                        <h1 className='text-center my-5'>Forgot Password?
+                        {showforgotform && (
+                            <div className='parent-container'> <i className="pi pi-lock my-3" style={{ fontSize: '5rem' }}></i></div>
+                        )}
+
+                        {otpmatched && (
+                            <div className='parent-container'> <i className="pi pi-lock my-3 " style={{ fontSize: '5rem' }}></i></div>
+                        )}
+
+                        {afterotpform && (
+                            <div className='parent-container'> <i className="pi pi-lock-open my-3 " style={{ fontSize: '5rem' }}></i></div>
+                        )}
+
+
+
+                        <h1 className='text-center '>Forgot Password?
                         </h1>
                         <small id="em" class="form-text text-center text-muted">You can reset your password here</small>
 
@@ -213,7 +227,7 @@ function Forgotpassword() {
                                     </button>
                                 </form>
                             </div>
-                        )};
+                        )}
 
 
                         {afterotpform && (

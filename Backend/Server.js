@@ -3,22 +3,24 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const { hashPassword } = require('./Hashpassword');
+const randomnumber =require('./Randomnumberforaccountno')
+const randomnumberonly =require('./Randomnumberforotp')
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 dotenv.config();
 var nodemailer = require('nodemailer');
 const cors = require('cors');
-app.use(cors(
-    {
-        origin: ["https://deploy-mern-1whq.vercel.app"], methods: ["POST", "GET"],
-        credentials: true
-    }
-));
-
 const app = express();
 const port = 3001;
 
-mongoose.connect('mongodb+srv://chinmay:LIP54dqmq0o0dODS@contact.cjo104s.mongodb.net/?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true });
+const mongodbURL = process.env.MONGODB_URL;
+mongoose.connect(mongodbURL, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch((err) => {
+    console.error('Error connecting to MongoDB:', err);
+  });
 
 const transactionSchema = new mongoose.Schema({
     date: { type: Date, default: Date.now },
@@ -53,28 +55,6 @@ const mailOptions = {
     to: " ",
     text: "Hello signup successfully"
 };
-
-function randomnumber(length) {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-    for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length);
-        result += characters.charAt(randomIndex);
-    }
-    return result;
-}
-
-function randomnumberonly(length) {
-    const characters = '1234567890';
-    let result = '';
-    for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length);
-        result += characters.charAt(randomIndex);
-    }
-    return result;
-}
-
-
 
 
 const User = mongoose.model('Users', userSchema);
