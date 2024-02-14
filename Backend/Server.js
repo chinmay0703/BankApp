@@ -15,8 +15,9 @@ const cors = require('cors');
 const app = express();
 const port = 3001;
 app.use(cors({
-    origin: 'https://bank-app-2bf8.vercel.app/'
+    origin: '*'
   }));
+  
 
 const mongodbURL = process.env.MONGODB_URL;
 mongoose.connect(mongodbURL, { useNewUrlParser: true, useUnifiedTopology: true })
