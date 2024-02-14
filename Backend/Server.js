@@ -3,29 +3,24 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const { hashPassword } = require('./Hashpassword');
-const randomnumber = require('./Randomnumberforaccountno')
-const randomnumberonly = require('./Randomnumberforotp')
+const randomnumber =require('./Randomnumberforaccountno')
+const randomnumberonly =require('./Randomnumberforotp')
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 dotenv.config();
 var nodemailer = require('nodemailer');
 const cors = require('cors');
 const app = express();
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, GET');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    next();
-});
-const port = process.env.PORT || 3001;
+const port = 3001;
+
 const mongodbURL = process.env.MONGODB_URL;
 mongoose.connect(mongodbURL, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => {
-        console.log('Connected to MongoDB');
-    })
-    .catch((err) => {
-        console.error('Error connecting to MongoDB:', err);
-    });
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch((err) => {
+    console.error('Error connecting to MongoDB:', err);
+  });
 
 const transactionSchema = new mongoose.Schema({
     date: { type: Date, default: Date.now },
@@ -131,9 +126,9 @@ app.post('/postdata', async (req, res) => {
 });
 
 // Get all users
-app.get('/', async (req, res) => {
-
-    res.json("Hello");
+app.get('/getall', async (req, res) => {
+    const users = await User.find();
+    res.status(200).json(users);
 });
 
 // Delete all user

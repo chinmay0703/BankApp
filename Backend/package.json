@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "bcrypt": "^5.0.0",
+    "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
@@ -10,9 +10,6 @@
     "mongodb": "^6.3.0",
     "mongoose": "^8.1.1",
     "nodemailer": "^6.9.9"
-  },
-  "scripts": {
-    "postinstall": "rm -rf node_modules/bcrypt && npm install bcrypt --target=14.17.0 --runtime=nodejs14.x"
   }
   
 }
