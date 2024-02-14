@@ -14,7 +14,7 @@ const app = express();
 const port = 3001;
 app.use(cors(
     {
-        origin: ["https://bank-app-2bf8.vercel.app"], methods: ["POST", "GET"],
+        origin: ["*"], methods: ["POST", "GET"],
         credentials: true
     }
 ));
