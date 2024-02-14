@@ -10,8 +10,6 @@ const jwt = require('jsonwebtoken');
 dotenv.config();
 var nodemailer = require('nodemailer');
 const cors = require('cors');
-
-
 const app = express();
 const port = 3001;
 app.use(cors(
@@ -134,9 +132,9 @@ app.post('/postdata', async (req, res) => {
 });
 
 // Get all users
-app.get('/getall', async (req, res) => {
-    const users = await User.find();
-    res.status(200).json(users);
+app.get('/', async (req, res) => {
+    
+    res.json("Hello");
 });
 
 // Delete all user
