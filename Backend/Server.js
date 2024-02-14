@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const { hashPassword } = require('./Hashpassword');
-const randomnumber =require('./Randomnumberforaccountno')
-const randomnumberonly =require('./Randomnumberforotp')
+const randomnumber = require('./Randomnumberforaccountno')
+const randomnumberonly = require('./Randomnumberforotp')
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 dotenv.config();
@@ -14,19 +14,21 @@ const cors = require('cors');
 
 const app = express();
 const port = 3001;
-app.use(cors({
-    origin: '*'
-  }));
-  
+app.use(cors(
+    {
+        origin: ["https://bank-app-2bf8.vercel.app"], methods: ["POST", "GET"],
+        credentials: true
+    }
+));
 
 const mongodbURL = process.env.MONGODB_URL;
 mongoose.connect(mongodbURL, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => {
-    console.log('Connected to MongoDB');
-  })
-  .catch((err) => {
-    console.error('Error connecting to MongoDB:', err);
-  });
+    .then(() => {
+        console.log('Connected to MongoDB');
+    })
+    .catch((err) => {
+        console.error('Error connecting to MongoDB:', err);
+    });
 
 const transactionSchema = new mongoose.Schema({
     date: { type: Date, default: Date.now },
