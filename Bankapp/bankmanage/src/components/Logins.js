@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react';
-
 import { Toast } from 'primereact/toast';
 import axios from 'axios';
 import '../components/login.css';
@@ -19,15 +18,6 @@ function Login() {
     const showSuccess = () => {
         toast.current.show({ severity: 'success', summary: 'Login Successfully', detail: 'Welcome To the CTC Bank', life: 3000 });
     }
-
-    // const showInfo = () => {
-    //     toast.current.show({ severity: 'info', summary: 'Info', detail: 'Message Content', life: 3000 });
-    // }
-
-    // const showWarn = () => {
-    //     toast.current.show({ severity: 'warn', summary: 'Warning', detail: 'Message Content', life: 3000 });
-    // }
-
     const showError = (er) => {
         toast.current.show({ severity: 'error', summary: 'Try again', detail: er, life: 3000 });
     }
