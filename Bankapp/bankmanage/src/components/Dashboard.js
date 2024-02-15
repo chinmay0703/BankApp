@@ -60,6 +60,7 @@ function Dashboard() {
       showError("Please Enter Amount You want to send ");
       return
     }
+   
     const formData = {
       email: formdata.email,
       recieve: recieveremail,
@@ -240,6 +241,7 @@ function Dashboard() {
                       style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
                     />
                   </div>
+                <button className='btn'><a> <strong className='' onClick={handlesubmit}>Resend OTP</strong></a></button>
                   <button type="submit" className='btn btn-primary ' style={{ width: '100%', padding: '10px', borderRadius: '4px', background: '#007bff', color: '#fff' }}>Submit</button>
                 </form>
               </div>
@@ -252,7 +254,6 @@ function Dashboard() {
       ) : (
         <>
           <div className='container container-fluid my-5 py-5'>
-
             <p className='text-center'>Please <Link to={"/login"} style={{ textDecoration: 'none' }}> Login</Link></p>
           </div>
         </>

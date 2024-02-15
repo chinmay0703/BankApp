@@ -47,6 +47,10 @@ function Signup() {
             console.log(password.feedback);
             return;
         }
+        if (phone.length < 10) {
+            showError("Please Enter 10 Digit phone no.");
+            return;
+        }
         var token = localStorage.getItem('Token');
         if (token) {
             showError("Unable to Sign Up: You are currently logged in. Please log out before creating a new account.");

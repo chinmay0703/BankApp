@@ -1,1 +1,9 @@
-GET http://localhost:3001/getall
+POST http://localhost:3001/ge
+Content-Type: application/json
+
+{
+  "email": "chinmayvyawahare94036@gmail.com"
+}
+
+
+# GET http://localhost:3001/getall
